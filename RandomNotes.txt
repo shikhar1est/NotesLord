@@ -1,0 +1,27 @@
+** What is Data Migration?
+
+-->The Database Migration step, specifically the line DB.AutoMigrate(&models.Note{}) in your Go code, refers to the process of managing and evolving the database schema (structure) based on your application's data models (Go structs).
+
+In the context of the GORM ORM:
+
+1. The General Concept of Database Migration
+In software development, a database migration is a structured way to make version-controlled, incremental, and reversible changes to the database schema.
+
+*When you start a project, you need to create the tables.
+
+*Later, you might need to add a new column, rename an existing one, or add an index.
+
+*The migration process handles these structural changes without losing existing data.
+
+2. GORM's AutoMigrate
+AutoMigrate is GORM's automatic, opinionated approach to handling these schema changes.
+
+When you call DB.AutoMigrate(&models.Note{}), GORM performs the following operations by comparing the models.Note struct to the actual state of the database:
+
+Action	                                       Description
+Creates Tables	               If the corresponding table (e.g., notes) does not exist, GORM will create it, including all the columns and metadata defined in the Note struct (like Title, Content, and the fields from gorm.Model).
+Adds Missing Columns	       If the table exists but you have added a new field to the Note struct (e.g., a Priority field), GORM will add the corresponding priority column to the existing table.
+Adds Constraints/Indexes	   It will create missing foreign keys, constraints, and indexes defined by struct tags.
+Updates Column Types	       It may change an existing column's type if its size or precision changes (or if it changes from non-nullable to nullable).
+Crucially, it WON'T:	       GORM is designed to protect your data. It will NOT delete unused columns, drop tables, or alter columns in ways that could risk data loss. For destructive changes, you must write custom SQL or use a more comprehensive migration tool.
+

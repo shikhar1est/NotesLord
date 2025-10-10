@@ -7,7 +7,7 @@ import (
 	"net/http"  //creates http server and clients
 	"strconv"  //converts strings to other data types and vice versa
 	"strings"  //provides functions for manipulating strings
-	"gorm.io/driver/sqlite"  //SQLite driver for GORM
+	"gorm.io/driver/sqlite"  //SQLite driver for GORM, allows GORM to communicate with SQLite DB
 	"gorm.io/gorm"   //GORM library for ORM (Object-Relational Mapping)
 )
 
