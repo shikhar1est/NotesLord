@@ -3,11 +3,14 @@
 package routes
 
 import (
+	"log"
 	"github.com/go-chi/chi/v5"
 	"noteslord/handlers"
 )
 
-func RegisterNoteRoutes(r chi.Router) { //here 'r' is a chi.Router instance, which is used to define routes
+func RegisterNoteRoutes(r chi.Router) {
+	log.Println("RegisterNoteRoutes called!")
+	 //here 'r' is a chi.Router instance, which is used to define routes
 	//we define a group of routes under the /notes path
 	//each route corresponds to a specific HTTP method (GET, POST, PUT, DELETE)
 	//and is associated with a handler function from the handlers package

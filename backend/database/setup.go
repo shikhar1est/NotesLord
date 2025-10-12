@@ -8,6 +8,7 @@ import (
 )
 
 var DB *gorm.DB // Global DB variable
+//CONNECTS TO GORM
 
 func ConnectDB(){
 	var err error
@@ -20,7 +21,7 @@ func ConnectDB(){
 	if err != nil {
 		log.Fatal("Failed to connect to database:", err)
 	}
-	err=DB.AutoMigrate(&models.Note{}) //This is a crucial step: GORM inspects the models.Note struct
+	err=DB.AutoMigrate(&models.Note{}, &models.User{}) //This is a crucial step: GORM inspects the models.Note struct
 	//  and ensures the corresponding database table (notes) exists and has all the necessary columns
 	//  (ID, Title, Content, etc.). If the table doesn't exist, it creates it.
 	//  If the table exists but is missing a column, it adds the column.
