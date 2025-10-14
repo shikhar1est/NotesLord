@@ -3,16 +3,18 @@ package handlers
 import (
     "encoding/json"
     "net/http"
+    "regexp"
+    "strings"
     "time"
 
     "github.com/golang-jwt/jwt/v5"
     "golang.org/x/crypto/bcrypt"
     "gorm.io/gorm"
 
-    "noteslord/models"
+    "your_project/models"
 )
 
-var jwtKey = []byte("your_secret_key") // Change this in production
+var jwtKey = []byte("your_secret_key")
 
 type RegisterInput struct {
     Username string `json:"username"`
@@ -25,15 +27,41 @@ type LoginInput struct {
     Password string `json:"password"`
 }
 
-// 🟩 Register Handler
+func isValidEmail(email string) bool { //this is a helper function to validate email format using regex
+	//regex pattern for validating email addresses
+    regex := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$`)
+    return regex.MatchString(strings.ToLower(email))
+}
+
+
 func Register(db *gorm.DB) http.HandlerFunc {
     return func(w http.ResponseWriter, r *http.Request) {
         var input RegisterInput
         if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-            http.Error(w, "Invalid input", http.StatusBadRequest)
+            http.Error(w, "Invalid input format", http.StatusBadRequest)
             return
         }
 
+        input.Username = strings.TrimSpace(input.Username)
+        input.Email = strings.TrimSpace(input.Email)
+
+        // Basic validation
+        if input.Username == "" || input.Email == "" || input.Password == "" {
+            http.Error(w, "All fields are required", http.StatusBadRequest)
+            return
+        }
+
+        if !isValidEmail(input.Email) {
+            http.Error(w, "Invalid email format", http.StatusBadRequest)
+            return
+        }
+
+        if len(input.Password) < 6 {
+            http.Error(w, "Password must be at least 6 characters", http.StatusBadRequest)
+            return
+        }
+
+        // Hash password
         hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
         if err != nil {
             http.Error(w, "Error hashing password", http.StatusInternalServerError)
@@ -61,7 +89,20 @@ func Login(db *gorm.DB) http.HandlerFunc {
     return func(w http.ResponseWriter, r *http.Request) {
         var input LoginInput
         if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-            http.Error(w, "Invalid input", http.StatusBadRequest)
+            http.Error(w, "Invalid input format", http.StatusBadRequest)
+            return
+        }
+
+        input.Email = strings.TrimSpace(input.Email)
+
+        // Basic validation
+        if input.Email == "" || input.Password == "" {
+            http.Error(w, "Email and password are required", http.StatusBadRequest)
+            return
+        }
+
+        if !isValidEmail(input.Email) {
+            http.Error(w, "Invalid email format", http.StatusBadRequest)
             return
         }
 
