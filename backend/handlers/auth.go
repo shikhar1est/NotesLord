@@ -44,8 +44,6 @@ func Register(db *gorm.DB) http.HandlerFunc {
 
         input.Username = strings.TrimSpace(input.Username)
         input.Email = strings.TrimSpace(input.Email)
-
-        // Basic validation
         if input.Username == "" || input.Email == "" || input.Password == "" {
             http.Error(w, "All fields are required", http.StatusBadRequest)
             return
