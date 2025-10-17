@@ -29,7 +29,7 @@ type LoginInput struct {
 
 func isValidEmail(email string) bool { //this is a helper function to validate email format using regex
 	//regex pattern for validating email addresses
-    regex := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$`)
+    regex := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$`) //some regex patterns may vary
     return regex.MatchString(strings.ToLower(email))
 }
 
