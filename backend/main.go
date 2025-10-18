@@ -20,7 +20,7 @@ func main() {
 	r.Use(middleware.Recoverer)
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("Welcome to NotesLord API"))
+		w.Write([]byte("Welcome to NotesLord"))
 	})
 
 	routes.RegisterNoteRoutes(r)
