@@ -15,8 +15,9 @@ import (
 func main() {
 	database.ConnectDB()
 
-	r := chi.NewRouter()
-	r.Use(middleware.Logger)
+	r := chi.NewRouter() //here we create a router instance using chi.NewRouter()
+	r.Use(middleware.Logger) //inbuilt middleware that logs the start and end of each request, 
+	// along with some useful data about what was requested and how long it took to process.
 	r.Use(middleware.Recoverer)
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
