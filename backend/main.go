@@ -9,10 +9,12 @@ import (
 
 	"noteslord/database"
 	"noteslord/routes"
+	"noteslord/config"
 )
 
 // Initialize SQLite database
 func main() {
+	config.LoadEnv()
 	database.ConnectDB()
 
 	r := chi.NewRouter() //here we create a router instance using chi.NewRouter()

@@ -3,59 +3,48 @@ package handlers
 import (
     "encoding/json"
     "net/http"
-    "regexp" //useful for validating email formats
     "strings"
     "time"
-
+    "github.com/go-playground/validator/v10"
     "github.com/golang-jwt/jwt/v5"
     "golang.org/x/crypto/bcrypt"
     "gorm.io/gorm"
-
+    "noteslord/config"
     "noteslord/models"
 )
 
-var jwtKey = []byte("SECRET_KEY")
+var validate = validator.New()
 
 type RegisterInput struct {
-    Username string `json:"username"`
-    Email    string `json:"email"`
-    Password string `json:"password"`
+    Username string `json:"username" validate:"required,min=3,max=50"`
+    Email    string `json:"email" validate:"required,email"`
+    Password string `json:"password" validate:"required,min=6"`
 }
 
 type LoginInput struct {
-    Email    string `json:"email"`
-    Password string `json:"password"`
-}
-
-
-func isValidEmail(email string) bool {// Helper function to validate email format
-    regex := regexp.MustCompile(`^[a-z0-9._%+\-]+@[a-z0-9.\-]+\.[a-z]{2,}$`)
-    return regex.MatchString(strings.ToLower(email))
+    Email    string `json:"email" validate:"required,email"`
+    Password string `json:"password" validate:"required"`
 }
 
 func Register(db *gorm.DB) http.HandlerFunc {
     return func(w http.ResponseWriter, r *http.Request) {
         var input RegisterInput
-        if err := json.NewDecoder(r.Body).Decode(&input); err != nil { //here we decode the required fields from the request body
+        if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
             http.Error(w, "Invalid input format", http.StatusBadRequest)
             return
         }
+
+        // Trim extra spaces
         input.Username = strings.TrimSpace(input.Username)
         input.Email = strings.TrimSpace(input.Email)
-        if input.Username == "" || input.Email == "" || input.Password == "" { //we check if all required fields are present
-            http.Error(w, "All fields are required", http.StatusBadRequest)
+
+        // Validate struct
+        if err := validate.Struct(input); err != nil {
+            http.Error(w, err.Error(), http.StatusBadRequest)
             return
         }
 
-        if !isValidEmail(input.Email) {
-            http.Error(w, "Invalid email format", http.StatusBadRequest)
-            return
-        }
-
-        if len(input.Password) < 6 {
-            http.Error(w, "Password must be at least 6 characters", http.StatusBadRequest)
-            return
-        }
+        // Hash password
         hashedPassword, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
         if err != nil {
             http.Error(w, "Error hashing password", http.StatusInternalServerError)
@@ -77,6 +66,8 @@ func Register(db *gorm.DB) http.HandlerFunc {
         json.NewEncoder(w).Encode(map[string]string{"message": "User registered successfully"})
     }
 }
+
+// 🟨 Login Handler
 func Login(db *gorm.DB) http.HandlerFunc {
     return func(w http.ResponseWriter, r *http.Request) {
         var input LoginInput
@@ -87,13 +78,8 @@ func Login(db *gorm.DB) http.HandlerFunc {
 
         input.Email = strings.TrimSpace(input.Email)
 
-        if input.Email == "" || input.Password == "" {
-            http.Error(w, "Email and password are required", http.StatusBadRequest)
-            return
-        }
-
-        if !isValidEmail(input.Email) {
-            http.Error(w, "Invalid email format", http.StatusBadRequest)
+        if err := validate.Struct(input); err != nil {
+            http.Error(w, err.Error(), http.StatusBadRequest)
             return
         }
 
@@ -108,12 +94,13 @@ func Login(db *gorm.DB) http.HandlerFunc {
             return
         }
 
+        // Generate JWT Token
         token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
             "user_id": user.ID,
             "exp":     time.Now().Add(24 * time.Hour).Unix(),
         })
 
-        tokenString, err := token.SignedString(jwtKey)
+        tokenString, err := token.SignedString([]byte(config.JWTSecret))
         if err != nil {
             http.Error(w, "Could not generate token", http.StatusInternalServerError)
             return
