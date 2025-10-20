@@ -8,4 +8,5 @@ type Note struct { //declares a new type named Note, which is a struct
 	gorm.Model //This is an embedded struct,GORM's built-in model, includes fields ID, CreatedAt, UpdatedAt, DeletedAt
 	Title   string `json:"title"`
 	Content string `json:"content"`
+	UserID  uint   `json:"user_id"` //foreign key to associate note with a user
 }

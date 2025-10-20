@@ -6,6 +6,8 @@ import (
 	"log"
 	"github.com/go-chi/chi/v5"
 	"noteslord/handlers"
+	"noteslord/database"
+	"noteslord/middleware"
 )
 
 func RegisterNoteRoutes(r chi.Router) {
@@ -16,6 +18,7 @@ func RegisterNoteRoutes(r chi.Router) {
 	//and is associated with a handler function from the handlers package
 	//these handler functions contain the logic to process the requests and generate responses
 	r.Route("/notes", func(r chi.Router) {
+		r.Use(middleware.JWTAuthMiddleware(database.DB))
 		r.Get("/", handlers.GetAllNotes)
 		r.Get("/{id}", handlers.GetNoteByID)
 		r.Post("/", handlers.CreateNote)
