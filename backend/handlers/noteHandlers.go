@@ -123,7 +123,7 @@ func DeleteNote(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Forbidden", http.StatusForbidden)
 		return
 	}
-
+    //cleopatra
 	database.DB.Delete(&note)
 	w.WriteHeader(http.StatusNoContent)
 }
