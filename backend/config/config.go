@@ -1,5 +1,5 @@
 package config
-
+//config file
 import (
     "log"
     "os"

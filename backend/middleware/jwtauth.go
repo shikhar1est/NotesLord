@@ -23,7 +23,7 @@ func JWTAuthMiddleware(db *gorm.DB) func(http.Handler) http.Handler {
                 return
             }
 
-            tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+            tokenString := strings.TrimPrefix(authHeader, "Bearer")
             if tokenString == authHeader {
                 http.Error(w, "Invalid token format", http.StatusUnauthorized)
                 return
