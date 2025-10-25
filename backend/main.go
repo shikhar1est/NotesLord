@@ -26,6 +26,7 @@ func main() {
 		w.Write([]byte("Welcome to NotesLord"))
 	})
 
+	routes.RegisterAuthRoutes(r)
 	routes.RegisterNoteRoutes(r)
 	if err := chi.Walk(r, func(method string, route string, handler http.Handler, middlewares ...func(http.Handler) http.Handler) error {
     log.Printf("%s %s\n", method, route)
