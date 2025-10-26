@@ -7,8 +7,7 @@ import (
 	"noteslord/models"
 )
 
-var DB *gorm.DB // Global DB variable
-//CONNECTS TO GORM
+var DB *gorm.DB 
 
 func ConnectDB(){
 	var err error
