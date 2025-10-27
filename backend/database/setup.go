@@ -11,7 +11,7 @@ var DB *gorm.DB
 
 func ConnectDB(){
 	var err error
-	DB,err=gorm.Open(sqlite.Open("notes.db"),&gorm.Config{}) //We establish the connection and
+	DB,err=gorm.Open(sqlite.Open("notes.db"),&gorm.Config{})
 	// "sqlite.Open("notes.db")" specifies specifies to use the SQLite driver and connect to a file named notes.db .
 	//  If the file doesn't exist, SQLite will create it.
 	//gorm.Open(...) attempts to open the connection using the 
