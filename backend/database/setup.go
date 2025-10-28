@@ -15,8 +15,6 @@ func ConnectDB(){
 	// "sqlite.Open("notes.db")" specifies specifies to use the SQLite driver and connect to a file named notes.db .
 	//  If the file doesn't exist, SQLite will create it.
 	//gorm.Open(...) attempts to open the connection using the 
-	// specified driver and passes an optional gorm.Config{} for configuration.
-	//  The result (the connection object and an error) are assigned to DB and err.
 	if err != nil {
 		log.Fatal("Failed to connect to database:", err)
 	}
